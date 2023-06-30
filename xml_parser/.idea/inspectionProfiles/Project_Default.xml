@@ -1,0 +1,60 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="W191" />
+          <option value="E101" />
+          <option value="W292" />
+          <option value="E731" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="N803" />
+          <option value="N806" />
+          <option value="N802" />
+          <option value="N801" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyShadowingBuiltinsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredNames">
+        <list>
+          <option value="iter" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="vk.method" />
+          <option value="numpy.sum" />
+          <option value="recur.layer1" />
+          <option value="float.N" />
+          <option value="keras.datasets.imdb.load_data" />
+          <option value="cv2.VideoCapture" />
+          <option value="cv2.imwrite" />
+          <option value="cv2.WINDOW_NORMAL" />
+          <option value="cv2.namedWindow" />
+          <option value="cv2.imshow" />
+          <option value="cv2.waitKey" />
+          <option value="cv2.destroyAllWindows" />
+          <option value="cv2.threshold" />
+          <option value="cv2.cvtColor" />
+          <option value="cv2.COLOR_BGR2GRAY" />
+          <option value="cv2.rectangle" />
+          <option value="cv2.CascadeClassifier" />
+          <option value="cv2.imread" />
+          <option value="markov_process.NonTerminal" />
+          <option value="distribution.Distribution.Distribution" />
+          <option value="distribution.Distribution.FiniteDistribution" />
+          <option value="str.*" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
