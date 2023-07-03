@@ -1,0 +1,4 @@
+article - содержит список статей. Ключ не составной: item_id.
+authors - список авторов. Ключ составной: author_id, lastname.
+organisations - список организаций. Ключ составной: org_id, org_name.
+article_author и author_organisations - таблицы для соединения между тремя предыдущеми таблицами.

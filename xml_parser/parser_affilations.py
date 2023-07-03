@@ -23,5 +23,13 @@ for tag in soup.findAll("item"):
 authors_organisations = pd.DataFrame(author_organisation, columns=['author_id', 'author_name', 'org_id', 'org_name'])
 organisations = pd.DataFrame(organisation, columns=['org_id', 'org_name'])
 
+unique_org = organisations.value_counts().index
+
+unique = []
+for element in unique_org:
+    unique.append(element)
+
+org = pd.DataFrame(unique, columns=['org_id', 'org_name'])
+
 authors_organisations.to_excel('authors_organisations.xlsx')
-organisations.to_excel('organisations.xlsx')
+org.to_excel('organisations.xlsx')
