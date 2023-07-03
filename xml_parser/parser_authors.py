@@ -11,8 +11,7 @@ entire_info = set()
 
 for tag in soup.findAll("item"):
     for author in tag.find('authors').findAll("author"):
-        if author.find('authorid') is not None:
-            entire_info.add(tuple([author.find('authorid').text, "", ""]))
+        entire_info.add(tuple([author.find('authorid').text if author.find('authorid') is not None else "", "", ""]))
 
 new_entire_info = set()
 

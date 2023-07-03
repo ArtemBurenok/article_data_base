@@ -60,12 +60,13 @@ for tag in soup.findAll("item"):
     id_item = tag['id']
     for author in tag.find('authors').findAll('author'):
         author_id = author.find('authorid').text if author.find('authorid') is not None else ""
-        article_author.append([id_item, author_id])
+        author_name = author.find('lastname').text if author.find('lastname') is not None else ""
+        article_author.append([id_item, author_id, author_name])
 
 fd.close()
 
 article = pd.DataFrame(data=fields)
-article_author = pd.DataFrame(article_author, columns=['item_id', 'author_id'])
+article_author = pd.DataFrame(article_author, columns=['item_id', 'author_id', 'author_name'])
 
-article.to_excel("article.xlsx")
+# article.to_excel("article.xlsx")
 article_author.to_excel("article_author.xlsx")
