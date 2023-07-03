@@ -4,8 +4,7 @@ import pandas as pd
 fields = {"item_id": [], 'linkurl': [], 'genre': [], 'type': [], "journal_title": [], "issn": [], "eissn": [],
           "publisher": [], "vak": [], "rcsi": [], "wos": [], "scopus": [], "quartile": [], "year": [], "number": [],
           'contnumber': [], "volume": [], "page_begin": [], "page_end": [], "language": [], "title_article": [],
-          "doi": [], "edn": [], 'grnti': [], 'risc': [], 'corerisc': [], 'lastname': [], 'name': [], 'authorid': [],
-          'affiliations_list_orgname': [], 'affiliations_list_orgid': []}
+          "doi": [], "edn": [], 'grnti': [], 'risc': [], 'corerisc': []}
 
 fd = open('article.xml', 'r', encoding='utf-8')
 xml_file = fd.read()
@@ -55,29 +54,18 @@ for tag in soup.findAll("item"):
     fields['risc'].append(tag.find('risc').text if tag.find('risc') is not None else "")
     fields['corerisc'].append(tag.find('corerisc').text if tag.find('corerisc') is not None else "")
 
-    # authors
-    lastname_list, initials_list, author_id_list = [], [], []
+article_author = []
 
-    for author in tag.find('authors').findAll("author"):
-        lastname_list.append(author.find('lastname').text if author.find('lastname') is not None else "")
-        initials_list.append(author.find('initials').text if author.find('initials') is not None else "")
-        author_id_list.append(author.find('authorid').text if author.find('authorid') is not None else "")
-
-    fields['lastname'].append(lastname_list)
-    fields['name'].append(initials_list)
-    fields['authorid'].append(author_id_list)
-
-    affilation_orgname_list = []
-    affilation_orgid_list = []
-
-    for affilation in tag.find('affiliations').findAll("affiliation"):
-        affilation_orgname_list.append(affilation.find('orgname').text if affilation.find('orgname') is not None else "")
-        affilation_orgid_list.append(affilation.find('orgid').text if affilation.find('orgid') is not None else "")
-
-    fields['affiliations_list_orgname'].append(affilation_orgname_list)
-    fields['affiliations_list_orgid'].append(affilation_orgid_list)
+for tag in soup.findAll("item"):
+    id_item = tag['id']
+    for author in tag.find('authors').findAll('author'):
+        author_id = author.find('authorid').text if author.find('authorid') is not None else ""
+        article_author.append([id_item, author_id])
 
 fd.close()
 
-data = pd.DataFrame(data=fields)
-data.to_excel("article_data.xlsx")
+article = pd.DataFrame(data=fields)
+article_author = pd.DataFrame(article_author, columns=['item_id', 'author_id'])
+
+article.to_excel("article.xlsx")
+article_author.to_excel("article_author.xlsx")
