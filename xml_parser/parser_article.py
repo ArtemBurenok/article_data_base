@@ -68,5 +68,5 @@ fd.close()
 article = pd.DataFrame(data=fields)
 article_author = pd.DataFrame(article_author, columns=['item_id', 'author_id', 'author_name'])
 
-# article.to_excel("article.xlsx")
+article.to_excel("article.xlsx")
 article_author.to_excel("article_author.xlsx")
