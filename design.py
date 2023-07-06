@@ -213,7 +213,7 @@ class Ui_MainWindow(object):
         self.organisationsDB_button_iconwidget.setIcon(icon4)
         self.organisationsDB_button_iconwidget.setIconSize(QtCore.QSize(20, 20))
         self.organisationsDB_button_iconwidget.setCheckable(True)
-        self.organisationsDB_button_iconwidget.clicked.connect(lambda: self.dataLoadFromDB(self.tableWidget_organisations,'SELECT * FROM authors_organisations'))
+        self.organisationsDB_button_iconwidget.clicked.connect(lambda: self.dataLoadFromDB(self.tableWidget_organisations,'SELECT * FROM organisations'))
         self.organisationsDB_button_iconwidget.setAutoExclusive(True)
         self.organisationsDB_button_iconwidget.setObjectName("organisationsDB_button_iconwidget")
         self.verticalLayout.addWidget(self.organisationsDB_button_iconwidget)
@@ -409,8 +409,7 @@ class Ui_MainWindow(object):
                                     port="5432")
             cur = conn.cursor()
             cur.execute(query)
-            result = cur.fetchall()  # Use fetchall() to get the query results
-
+            result = cur.fetchall()
             tableWidget.setRowCount(0)
 
             for row_number, row_data in enumerate(result):

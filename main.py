@@ -1,8 +1,8 @@
 import sys
 from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton,QFileDialog,QMessageBox
 import pandas as pd
-import psycopg2
 from sqlalchemy import create_engine
+import datetime
 
 
 from dbsettings import database_parametres
@@ -33,7 +33,6 @@ class MainWindow(QMainWindow):
         self.import_button_expandedwidget.clicked.connect(self.importButtonClickHandler)
 
     def process_data(self):
-        # Replace 'your_database_parametres' with your actual database parameters
         db_params = {
             'dbname': "praktika",
             'user': "postgres",
@@ -44,10 +43,8 @@ class MainWindow(QMainWindow):
 
         connection_url = f"postgresql+psycopg2://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['dbname']}"
 
-        # Create the engine and connect to the database
         engine = create_engine(connection_url)
 
-        # Your SQL query
         sql_query = """
         SELECT DISTINCT
             a.item_id,
@@ -83,7 +80,6 @@ class MainWindow(QMainWindow):
             ao.org_id = '570';
         """
 
-        # Execute the query and load data into a DataFrame
         df = pd.read_sql_query(sql_query, engine)
 
         excel_template_path = "../article_data_base/shablon_kbpr.xlsx"
@@ -102,21 +98,18 @@ class MainWindow(QMainWindow):
         df_template['Идентификатор ISSN'] = df['issn']
         df_template['Идентификатор EDN'] = df['edn']
 
-        # Add other columns in a similar way
-        output_path = "path_to_output_file19.xlsx"
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        output_path = f"shablon_kbpr_{timestamp}.xlsx"
         df_template.to_excel(output_path)
         QMessageBox.information(self, "Экспорт", "Excel файл по шаблону кбпр создан!")
 
 
     def import_xlsx_to_postgresql(self,database_params, xlsx_file_path, table_name):
-        # Connect to the PostgreSQL database
         connection_str = f"postgresql://{database_params['user']}:{database_params['password']}@{database_params['host']}:{database_params['port']}/{database_params['dbname']}"
         engine = create_engine(connection_str)
 
-        # Read the data from the XLSX file into a DataFrame
         data_frame = pd.read_excel(xlsx_file_path)
 
-        # Insert the data into the PostgreSQL table
         data_frame.to_sql(table_name, engine, index=False, if_exists='replace')
 
 
@@ -124,7 +117,6 @@ class MainWindow(QMainWindow):
     def importButtonClickHandler(self):
         fname = QFileDialog.getOpenFileName(self, "Open XML file", "", "All Files (*);; XML Files (*.xml)")
 
-        # Проверяем, что fname[0] не пустая строка
         if fname[0]:
             extract_authors_info(fname[0])
             parse_articles_to_excel(fname[0])
@@ -148,7 +140,7 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(0)
 
     def on_articleDB_button_iconwidget_toggled(self):
-        self.ui.stackedWidget.setCurrentIndex(0)
+        self.ui.stackedWidget.setCurrentIndex(1)
 
 
     def on_articleDB_button_toggled(self):
