@@ -98,3 +98,39 @@
 	}
 /*= END
   ==================================================== */
+
+  /*= Style for user information button START
+  ==================================================== */
+	#tableWidget  {
+		background-color: white; /* Table background color */
+		font-size: 12pt;
+
+	}
+/*= END
+
+  /*= Style for user information button START
+  ==================================================== */
+	QHeaderView::section  {
+		background-color: #0a7e8c;
+        font-size: 12pt;
+        color: white;
+        font-weight: bold;
+	}
+/*= END
+
+  /*= Style for user information button START
+  ==================================================== */
+	QTableWidget QTableCornerButton::section  {
+		background-color: #0a7e8c;
+	}
+/*= END
+
+  /*= Style for user information button START
+  ==================================================== */
+	#pushButton  {
+		color:white;
+		background-color:#0a7e8c;
+		font-weight: bold;
+		font-size: 24pt;
+	}
+/*= END
