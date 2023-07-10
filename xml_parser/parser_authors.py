@@ -31,21 +31,20 @@ def extract_authors_info(xml_filename, output_filename='authors.xlsx'):
                     new_entire_info.add(tuple(new_list))
 
 
-authors = pd.DataFrame(new_entire_info, columns=['author_id', 'lastname', 'initials'])
-unique_lastname = authors[['author_id', 'lastname']].value_counts().index
-unique = []
+    authors = pd.DataFrame(new_entire_info, columns=['author_id', 'lastname', 'initials'])
+    unique_lastname = authors[['author_id', 'lastname']].value_counts().index
+    unique = []
 
-for element in unique_lastname:
-    id_lastname = list(element)
-    for info in new_entire_info:
-        if info[1] == id_lastname[1]:
-            id_lastname.append(info[2])
-            break
-    unique.append(id_lastname)
+    for element in unique_lastname:
+        id_lastname = list(element)
+        for info in new_entire_info:
+            if info[1] == id_lastname[1]:
+                id_lastname.append(info[2])
+                break
+        unique.append(id_lastname)
 
-unique_authors = pd.DataFrame(unique, columns=['author_id', 'lastname', 'initials'])
+    unique_authors = pd.DataFrame(unique, columns=['author_id', 'lastname', 'initials'])
 
-unique_authors.to_excel('authors.xlsx')
+    unique_authors.to_excel('authors.xlsx')
 
-authors = pd.DataFrame(new_entire_info, columns=['author_id', 'lastname', 'initials'])
-authors.to_excel(output_filename)
+

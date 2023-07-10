@@ -69,8 +69,7 @@ def parse_articles_to_excel(xml_filename):
             article_author.append([id_item, author_id, author_name])
 
 
-article.to_excel("article.xlsx")
-article_author.to_excel("article_author.xlsx")
 
-article_author = pd.DataFrame(article_author, columns=['item_id', 'author_id', 'author_name'])
-article_author.to_excel("article_author.xlsx")
+
+    article_author = pd.DataFrame(article_author, columns=['item_id', 'author_id', 'author_name'])
+    article_author.to_excel("article_author.xlsx")
