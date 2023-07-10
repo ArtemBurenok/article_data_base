@@ -46,7 +46,7 @@ class MainWindow(QMainWindow):
         engine = create_engine(connection_url)
 
         sql_query = """
-        SELECT DISTINCT
+         SELECT DISTINCT
             a.item_id,
             a.doi,
             a.year,
@@ -63,13 +63,15 @@ class MainWindow(QMainWindow):
             au.initials,
             nested.author_count
         FROM
-            article AS a
+            authors AS au
         JOIN
-            article_author AS aa ON a.item_id = aa.item_id
+            authors_organisations AS ao ON CAST(au.author_id AS text) = ao.author_id
+			AND au.lastname = ao.author_name
         JOIN
-            authors_organisations AS ao ON CAST(aa.author_id AS text) = ao.author_id
+            article_author AS aa ON CAST(aa.author_id AS text)  = ao.author_id
+			AND ao.author_name = aa.author_name
         JOIN
-            authors AS au ON aa.author_id = au.author_id
+            article AS a ON a.item_id = aa.item_id
         JOIN
             (
                 SELECT item_id, COUNT(author_name) AS author_count
