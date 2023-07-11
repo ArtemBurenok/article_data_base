@@ -405,7 +405,7 @@ class Ui_MainWindow(object):
         self.exit_button_expandedwidget.setText(_translate("MainWindow", "Выход"))
 
     def dataLoadFromDB(self,tableWidget, query):
-            conn = psycopg2.connect(database="praktika", user="postgres", password="sword9999", host="localhost",
+            conn = psycopg2.connect(database="test_db", user="postgres", password="1234", host="localhost",
                                     port="5432")
             cur = conn.cursor()
             cur.execute(query)

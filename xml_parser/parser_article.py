@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import pandas as pd
 
+
 def parse_articles_to_excel(xml_filename):
     fields = {"item_id": [], 'linkurl': [], 'genre': [], 'type': [], "journal_title": [], "issn": [], "eissn": [],
               "publisher": [], "vak": [], "rcsi": [], "wos": [], "scopus": [], "quartile": [], "year": [], "number": [],
@@ -68,8 +69,11 @@ def parse_articles_to_excel(xml_filename):
             author_name = author.find('lastname').text if author.find('lastname') is not None else ""
             article_author.append([id_item, author_id, author_name])
 
-
-
-
     article_author = pd.DataFrame(article_author, columns=['item_id', 'author_id', 'author_name'])
+    article_author['author_name'] = article_author['author_name'].apply(lambda x: x.lower().capitalize())
+
     article_author.to_excel("article_author.xlsx")
+
+
+if __name__ == '__main__':
+    parse_articles_to_excel('article.xml')

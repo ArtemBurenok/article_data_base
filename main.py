@@ -3,17 +3,11 @@ from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton,QFileDialog,Q
 import pandas as pd
 from sqlalchemy import create_engine
 import datetime
-
-
 from dbsettings import database_parametres
 from design import Ui_MainWindow
 from xml_parser.parser_authors import extract_authors_info
 from xml_parser.parser_affilations import parse_affilations_to_excel
 from xml_parser.parser_article import parse_articles_to_excel
-
-
-
-
 
 
 class MainWindow(QMainWindow):
@@ -34,9 +28,9 @@ class MainWindow(QMainWindow):
 
     def process_data(self):
         db_params = {
-            'dbname': "praktika",
+            'dbname': "test_db",
             'user': "postgres",
-            'password': "sword9999",
+            'password': "1234",
             'host': "localhost",
             'port': "5432"
         }
@@ -189,11 +183,6 @@ class MainWindow(QMainWindow):
 
     def on_export_button_expandedwidget_toggled(self):
         self.ui.stackedWidget.setCurrentIndex(8)
-
-
-
-
-
 
 
 if __name__ == "__main__":

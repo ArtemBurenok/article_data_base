@@ -1,6 +1,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 
+
 def parse_affilations_to_excel(xml_filename):
     fd = open(xml_filename, 'r', encoding='utf-8')
     xml_file = fd.read()
