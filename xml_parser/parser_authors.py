@@ -1,5 +1,7 @@
 from bs4 import BeautifulSoup
 import pandas as pd
+import numpy as np
+from transliterate import translit
 
 
 def extract_authors_info(xml_filename, output_filename='authors.xlsx'):
@@ -38,18 +40,25 @@ def extract_authors_info(xml_filename, output_filename='authors.xlsx'):
     for element in unique_lastname:
         id_lastname = list(element)
         for info in new_entire_info:
-            if info[1] == id_lastname[1] and len(info[2]) > 4 and " " in info[2]:
+            if (info[1] == id_lastname[1]) and (info[1] == id_lastname[1]) and (len(info[2]) > 4) and (" " in info[2]):
                 id_lastname.append(info[2])
                 break
         unique.append(id_lastname)
 
     for element in unique:
         for info in new_entire_info:
-            if len(element) == 2 and info[1] == element[1]:
+            if (len(element) == 2) and (info[1] == element[1]) and (info[0] == element[0]) and ():
                 element.append(info[2])
 
     unique_authors = pd.DataFrame(unique, columns=['author_id', 'lastname', 'initials'])
-    unique_authors['lastname'] = unique_authors['lastname'].apply(lambda x: x.lower().capitalize())
+
+    unique_authors['lastname'] = unique_authors['lastname'].apply(lambda x: x.lower())
+
+    unique_authors['lastname'] = unique_authors['lastname'].apply(lambda x: x.replace('ya', 'ja').replace('yu', 'ju'))
+    unique_authors['lastname'] = unique_authors['lastname'].apply(lambda x: translit(x, 'ru'))
+    unique_authors['lastname'] = unique_authors['lastname'].apply(lambda x: x.replace('ü', 'у'))
+
+    unique_authors['lastname'] = unique_authors['lastname'].apply(lambda x: x.capitalize())
 
     unique_authors.to_excel('authors.xlsx')
 
