@@ -60,7 +60,7 @@ def parse_articles_to_excel(xml_filename):
     fd.close()
 
     article = pd.DataFrame(data=fields)
-    article.to_excel("article.xlsx", index=False)
+    article.to_excel("../xml_parser/excel_files/article.xlsx", index=False)
 
     article_author = []
     for tag in soup.findAll("item"):
@@ -72,15 +72,16 @@ def parse_articles_to_excel(xml_filename):
 
     article_author = pd.DataFrame(article_author, columns=['item_id', 'author_id', 'author_name'])
 
+    article_author['author_name'] = article_author['author_name'].apply(lambda x: x.lower())
+
     article_author['author_name'] = article_author['author_name'].apply(lambda x: x.replace('ya', 'ja').replace('yu', 'ju'))
     article_author['author_name'] = article_author['author_name'].apply(lambda x: translit(x, 'ru'))
     article_author['author_name'] = article_author['author_name'].apply(lambda x: x.replace('ü', 'у'))
 
-    article_author['author_name'] = article_author['author_name'].apply(lambda x: x.lower().capitalize())
+    article_author['author_name'] = article_author['author_name'].apply(lambda x: x.capitalize())
 
-    article_author.to_excel("article_author.xlsx")
+    article_author.to_excel("../xml_parser/excel_files/article_author.xlsx")
 
 
 if __name__ == '__main__':
-    # parse_articles_to_excel('article.xml')
-    print(translit('Yanchevskaya'.replace('ya', 'ja'), 'ru'))
+    parse_articles_to_excel('article.xml')
