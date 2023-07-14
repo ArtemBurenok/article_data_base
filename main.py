@@ -227,18 +227,18 @@ class MainWindow(QMainWindow):
             existing_data['volume'] = data_frame['volume'].astype(object)
             existing_data['quartile'] = data_frame['quartile'].astype(object)
             existing_data['rcsi'] = data_frame['rcsi'].astype(object)
+        rows_before = len(existing_data)
         merged_data = existing_data.merge(data_frame, how='outer').drop_duplicates(keep=False)
+        rows_added = len(merged_data) - rows_before
+        print(f"Added {rows_added} rows")
         merged_data.to_sql(table_name, engine, index=False, if_exists='replace')
 
 
     def importButtonClickHandler(self):
         fname = QFileDialog.getOpenFileName(self, "Open XML file", "", "All Files (*);; XML Files (*.xml)")
         if fname[0]:
-            print(1)
             parse_articles_to_excel(fname[0])
-            print(2)
             parse_affilations_to_excel(fname[0])
-            print(3)
             extract_authors_info(fname[0])
             self.import_xlsx_to_postgresql(database_parametres, 'article_author.xlsx', 'article_author',0,False)
             self.import_xlsx_to_postgresql(database_parametres, 'article.xlsx', 'article',None,True)

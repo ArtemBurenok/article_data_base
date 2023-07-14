@@ -56,4 +56,3 @@ def parse_affilations_to_excel(xml_filename):
     data.to_excel('one_unique_organisations.xlsx')
     new.to_excel('new_one_authors_organisations.xlsx')
 
-

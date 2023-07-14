@@ -61,25 +61,21 @@ def extract_authors_info(xml_filename):
 
     unique_authors['lastname'] = unique_authors['lastname'].apply(lambda x: x.capitalize())
 
-    example_authors = pd.read_excel('authors_example.xlsx')['Фамилия']
-    different_lastname_set = set(unique_authors['lastname']) - set(example_authors)
-
-    for i in range(unique_authors.shape[0]):
-        lastname = unique_authors['lastname'].iloc[i]
-        if lastname not in different_lastname_set:
-            if lastname != main_fix(lastname)[0]:
-                root = tkinter.Tk()
-                root.withdraw()
-
-                variant_list = np.unique([f"{main_fix(lastname)[i]}" for i in range(len(main_fix(lastname)))])
-                messagebox.showerror('Ошибка', f'Возможно неправильное написание слова: {lastname} \n'
-                                               f'Варианты написания: \n {variant_list}')
+    # example_authors = pd.read_excel('authors_example.xlsx')['Фамилия']
+    # different_lastname_set = set(unique_authors['lastname']) - set(example_authors)
+    #
+    # for i in range(unique_authors.shape[0]):
+    #     lastname = unique_authors['lastname'].iloc[i]
+    #     if lastname not in different_lastname_set:
+    #         if lastname != main_fix(lastname)[0]:
+    #             root = tkinter.Tk()
+    #             root.withdraw()
+    #
+    #             variant_list = np.unique([f"{main_fix(lastname)[i]}" for i in range(len(main_fix(lastname)))])
+    #             messagebox.showerror('Ошибка', f'Возможно неправильное написание слова: {lastname} \n'
+    #                                            f'Варианты написания: \n {variant_list}')
 
 
     unique_authors.to_excel('authors.xlsx')
-
-
-if __name__ == '__main__':
-    extract_authors_info('article.xml')
 
 
