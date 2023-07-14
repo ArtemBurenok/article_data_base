@@ -53,9 +53,7 @@ def parse_affilations_to_excel(xml_filename):
                 authors_organisations.iloc[pairs]['org_name'] = data.iloc[org]['org_name']
 
     new = authors_organisations.drop_duplicates()
-    data.to_excel('../xml_parser/excel_files/one_unique_organisations.xlsx')
-    new.to_excel('../xml_parser/excel_files/new_one_authors_organisations.xlsx')
+    data.to_excel('one_unique_organisations.xlsx')
+    new.to_excel('new_one_authors_organisations.xlsx')
 
 
-if __name__ == "__main__":
-    parse_affilations_to_excel('article.xml')

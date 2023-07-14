@@ -25,12 +25,8 @@ def parse_affilations_to_excel(xml_filename):
     fd.close()
 
     authors_organisations = pd.DataFrame(author_organisation, columns=['author_id', 'author_name', 'org_id', 'org_name'])
-    authors_organisations.to_excel('../xml_parser/excel_files/authors_organisations.xlsx', index=False)
+    authors_organisations.to_excel('authors_organisations.xlsx', index=False)
 
     organisations = pd.DataFrame(organisation, columns=['org_id', 'org_name'])
     unique_org = organisations.drop_duplicates().reset_index(drop=True)
-    unique_org.to_excel('../xml_parser/excel_files/organisations.xlsx')
-
-
-if __name__ == '__main__':
-    parse_affilations_to_excel('article.xml')
+    unique_org.to_excel('organisations.xlsx')

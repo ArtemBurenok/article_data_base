@@ -60,8 +60,6 @@ def extract_authors_info(xml_filename, output_filename='authors.xlsx'):
 
     unique_authors['lastname'] = unique_authors['lastname'].apply(lambda x: x.capitalize())
 
-    unique_authors.to_excel('../xml_parser/excel_files/authors.xlsx')
+    unique_authors.to_excel('authors.xlsx')
 
 
-if __name__ == '__main__':
-    extract_authors_info('article.xml')

@@ -60,7 +60,7 @@ def parse_articles_to_excel(xml_filename):
     fd.close()
 
     article = pd.DataFrame(data=fields)
-    article.to_excel("../xml_parser/excel_files/article.xlsx", index=False)
+    article.to_excel("article.xlsx", index=False)
 
     article_author = []
     for tag in soup.findAll("item"):
@@ -80,8 +80,7 @@ def parse_articles_to_excel(xml_filename):
 
     article_author['author_name'] = article_author['author_name'].apply(lambda x: x.capitalize())
 
-    article_author.to_excel("../xml_parser/excel_files/article_author.xlsx")
+    article_author.to_excel("article_author.xlsx")
 
 
-if __name__ == '__main__':
-    parse_articles_to_excel('article.xml')
+
