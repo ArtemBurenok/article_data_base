@@ -234,8 +234,11 @@ class MainWindow(QMainWindow):
     def importButtonClickHandler(self):
         fname = QFileDialog.getOpenFileName(self, "Open XML file", "", "All Files (*);; XML Files (*.xml)")
         if fname[0]:
+            print(1)
             parse_articles_to_excel(fname[0])
+            print(2)
             parse_affilations_to_excel(fname[0])
+            print(3)
             extract_authors_info(fname[0])
             self.import_xlsx_to_postgresql(database_parametres, 'article_author.xlsx', 'article_author',0,False)
             self.import_xlsx_to_postgresql(database_parametres, 'article.xlsx', 'article',None,True)

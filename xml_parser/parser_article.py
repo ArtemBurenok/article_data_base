@@ -1,6 +1,10 @@
 from bs4 import BeautifulSoup
 import pandas as pd
 from transliterate import translit
+from xml_parser.check_errors import main_fix
+import tkinter
+import numpy as np
+from tkinter import messagebox
 
 
 def parse_articles_to_excel(xml_filename):
@@ -79,6 +83,20 @@ def parse_articles_to_excel(xml_filename):
     article_author['author_name'] = article_author['author_name'].apply(lambda x: x.replace('ü', 'у'))
 
     article_author['author_name'] = article_author['author_name'].apply(lambda x: x.capitalize())
+
+    example_authors = pd.read_excel('authors_example.xlsx')['Фамилия']
+    different_lastname_set = set(article_author['author_name']) - set(example_authors)
+
+    for i in range(article_author.shape[0]):
+        lastname = article_author['author_name'].iloc[i]
+        if lastname not in different_lastname_set:
+            if lastname != main_fix(lastname)[0]:
+                root = tkinter.Tk()
+                root.withdraw()
+
+                variant_list = np.unique([f"{main_fix(lastname)[i]}" for i in range(len(main_fix(lastname)))])
+                messagebox.showerror('Ошибка', f'Возможно неправильное написание слова: {lastname} \n'
+                                               f'Варианты написания: \n {variant_list}')
 
     article_author.to_excel("article_author.xlsx")
 
