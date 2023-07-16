@@ -26,6 +26,7 @@ def parse_affilations_to_excel(xml_filename):
 
     authors_organisations = pd.DataFrame(author_organisation, columns=['author_id', 'author_name', 'org_id', 'org_name'])
 
+
     organisations = pd.DataFrame(organisation, columns=['org_id', 'org_name'])
     unique_org = organisations.drop_duplicates().reset_index(drop=True)
 
@@ -47,11 +48,12 @@ def parse_affilations_to_excel(xml_filename):
 
     data = pd.DataFrame(one_org_index, columns=['org_id', 'org_name'])
 
+
     for pairs in range(authors_organisations.shape[0]):
         for org in range(data.shape[0]):
             if authors_organisations.iloc[pairs]['org_id'] == data.iloc[org]['org_id']:
                 authors_organisations.iloc[pairs]['org_name'] = data.iloc[org]['org_name']
-
+    authors_organisations['author_name'] = authors_organisations['author_name'].apply(lambda x: x.lower().capitalize())
     new = authors_organisations.drop_duplicates()
     data.to_excel('one_unique_organisations.xlsx')
     new.to_excel('new_one_authors_organisations.xlsx')

@@ -8,6 +8,7 @@
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 import psycopg2
+from dbsettings import database_parametres
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -159,7 +160,7 @@ class Ui_MainWindow(object):
         self.tableWidget_article.setObjectName("tableWidget_article")
         self.tableWidget_article.setColumnCount(100)
         self.tableWidget_article.setRowCount(100)
-        column_names_article = ["item_id", "linkurl", "genre", "type", "journal_title", "issn", "eissn,publisher",
+        column_names_article = ["item_id", "linkurl", "genre", "type", "journal_title", "issn","eissn","publisher",
                                 "vak",
                                 "rcsi", "wos", "scopus", "quartile", "year", "number", "contnumber", "volume",
                                 "page_begin",
@@ -513,8 +514,11 @@ class Ui_MainWindow(object):
         self.exit_button_expandedwidget.setText(_translate("MainWindow", "Выход"))
 
     def dataLoadFromDB(self,tableWidget, query):
-            conn = psycopg2.connect(database="praktika", user="postgres", password="sword9999", host="localhost",
-                                    port="5432")
+            conn = psycopg2.connect(database=database_parametres['dbname'],
+                                    user=database_parametres['user'],
+                                    password=database_parametres['password'],
+                                    host=database_parametres['host'],
+                                    port=database_parametres['port'])
             cur = conn.cursor()
             cur.execute(query)
             result = cur.fetchall()
