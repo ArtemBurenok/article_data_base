@@ -62,12 +62,12 @@ class MainWindow(QMainWindow):
             authors_organisations.org_id,
             authors_organisations.org_name,
             CASE
-  			WHEN authors_splitted.first_name LIKE '%.%' OR (authors_splitted.first_name ~ '[A-Za-z]' AND authors_reference_with_id.birth_year IS NOT NULL) OR authors_splitted.first_name IS NULL 
+  			WHEN (authors_splitted.first_name LIKE '%.%' AND authors_reference_with_id.birth_year IS NOT NULL) OR (authors_splitted.first_name ~ '[A-Za-z]' AND authors_reference_with_id.birth_year IS NOT NULL) OR authors_splitted.first_name IS NULL 
 			THEN authors_reference_with_id.first_name
   			ELSE authors_splitted.first_name
 			END AS first_name,
 			CASE
-  			WHEN authors_splitted.patronymic LIKE '%.%' OR authors_splitted.patronymic IS NULL OR (authors_splitted.patronymic ~ '[A-Za-z]'  AND authors_reference_with_id.birth_year IS NOT NULL)
+  			WHEN (authors_splitted.patronymic LIKE '%.%' AND authors_reference_with_id.birth_year IS NOT NULL) OR authors_splitted.patronymic IS NULL OR (authors_splitted.patronymic ~ '[A-Za-z]'  AND authors_reference_with_id.birth_year IS NOT NULL)
 			THEN authors_reference_with_id.patronymic
   			ELSE authors_splitted.patronymic
 			END,
@@ -163,6 +163,16 @@ class MainWindow(QMainWindow):
         cur.close()
         conn.close()
 
+    deleteUselessDuplicatesFromASSTable_query = """
+            DELETE FROM authors_splitted
+            WHERE author_id IN 
+            (SELECT author_id
+            FROM authors_splitted
+            GROUP BY author_id
+            HAVING COUNT(author_id) > 1)
+            AND first_name LIKE '%.%' OR (initials NOT LIKE '% %' AND initials NOT LIKE '%.%')
+            """
+
     getOnlyDistinctRowsFromAATable_query = """
             CREATE TABLE article_author_distinct AS
             SELECT DISTINCT * FROM article_author;
@@ -186,7 +196,7 @@ class MainWindow(QMainWindow):
     splitInitials_query = """
         DROP TABLE IF EXISTS authors_splitted;
         CREATE TABLE  authors_splitted AS
-        SELECT author_id, lastname,
+        SELECT author_id, lastname,initials,
             CASE
                 WHEN initials LIKE '% %' THEN split_part(authors.initials, ' ', 1)
                 WHEN initials NOT LIKE '% %' AND initials NOT LIKE '%.%' THEN initials
@@ -255,12 +265,12 @@ class MainWindow(QMainWindow):
             'risc',
             'corerisc',
             'volume']
-        data_frame = pd.read_excel(xlsx_file_path,index_col=index_col).drop_duplicates(keep=False)
+        data_frame = pd.read_excel(xlsx_file_path,index_col=index_col)
         if table_name == 'article':
             for column in float_columns:
                 data_frame[column] = data_frame[column].apply(lambda x: replace_float_with_null(x))
         existing_data_query = f"SELECT DISTINCT * FROM {table_name}"
-        existing_data = pd.read_sql(existing_data_query, engine).drop_duplicates(keep=False)
+        existing_data = pd.read_sql(existing_data_query, engine)
         if table_name == 'authors_organisations':
             data_frame.reset_index(drop=True, inplace=True)
             data_frame = data_frame.iloc[0:]
@@ -283,17 +293,18 @@ class MainWindow(QMainWindow):
             merged_data = existing_data.merge(data_frame, how='outer')
         else:
             merged_data = existing_data.merge(data_frame, how='outer').drop_duplicates(keep=False)
-        # if table_name == 'article':
-        #     column_types = existing_data.dtypes
-        #     column_types_excel = data_frame.dtypes
-        #     column_types_merged = merged_data.dtypes
-        #     print(column_types)
-        #     print(column_types_excel)
-        #     print(column_types_merged)
+        if table_name == 'article_author':
+            column_types = existing_data.dtypes
+            column_types_excel = data_frame.dtypes
+            column_types_merged = merged_data.dtypes
+            print(column_types)
+            print(column_types_excel)
+            print(column_types_merged)
         #     pd.set_option('display.max_columns', None)
         #     pd.set_option('display.max_rows', None)
         #     print(existing_data.select_dtypes(include=['object']).applymap(type))
         #     print(data_frame.select_dtypes(include=['object']).applymap(type))
+        merged_data_with_duplicates = existing_data.merge(data_frame, how='outer')
         num_duplicates = len(merged_data) - len(merged_data)
         rows_added = len(merged_data) - rows_before
         if rows_added >= 0:
@@ -319,6 +330,7 @@ class MainWindow(QMainWindow):
             self.execute_query_with_params(self.setEmptyValuesToNullAOTable_query)
             self.execute_query_with_params(self.setEmptyValuesToNullAATable_query)
             self.execute_query_with_params(self.splitInitials_query)
+            self.execute_query_with_params(self.deleteUselessDuplicatesFromASSTable_query)
             self.execute_query_with_params(self.setEmptyValuesToNullASSTable_query)
             self.execute_query_with_params(self.createAuthorsReference_query)
             self.execute_query_with_params(self.getOnlyDistinctRowsFromAATable_query)
