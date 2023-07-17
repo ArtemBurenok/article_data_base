@@ -9,6 +9,9 @@ from interface_updated import Ui_MainWindow
 from xml_parser.parser_article import parse_articles_to_excel
 from xml_parser.parser_authors import extract_authors_info
 from xml_parser.parser_unique_organizations import parse_affilations_to_excel
+# from parser_article import parse_articles_to_excel
+# from parser_authors import extract_authors_info
+# from parser_unique_organizations import parse_affilations_to_excel
 import psycopg2
 
 
