@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 import pandas as pd
-from transliterate import translit
 from xml_parser.check_errors import main_fix
 import tkinter
 import numpy as np
@@ -61,47 +60,46 @@ def parse_articles_to_excel(xml_filename):
         fields['risc'].append(tag.find('risc').text if tag.find('risc') is not None else "")
         fields['corerisc'].append(tag.find('corerisc').text if tag.find('corerisc') is not None else "")
 
-    fd.close()
-
     article = pd.DataFrame(data=fields)
     article.to_excel("article.xlsx", index=False)
 
     article_author = []
     for tag in soup.findAll("item"):
         id_item = tag['id']
+        list_num = []
         for author in tag.find('authors').findAll('author'):
-            author_id = author.find('authorid').text if author.find('authorid') is not None else ""
-            author_name = author.find('lastname').text if author.find('lastname') is not None else ""
-            article_author.append([id_item, author_id, author_name])
+            num = author['num']
+            if num not in list_num:
+                list_num.append(author['num'])
+                author_id = author.find('authorid').text if author.find('authorid') is not None else ""
+                author_name = author.find('lastname').text if author.find('lastname') is not None else ""
+                article_author.append([id_item, author_id, author_name])
+
+    fd.close()
 
     article_author = pd.DataFrame(article_author, columns=['item_id', 'author_id', 'author_name'])
 
     article_author['author_name'] = article_author['author_name'].apply(lambda x: x.lower())
-
-    article_author['author_name'] = article_author['author_name'].apply(lambda x: x.replace('ya', 'ja').replace('yu', 'ju'))
-    article_author['author_name'] = article_author['author_name'].apply(lambda x: translit(x, 'ru'))
-    article_author['author_name'] = article_author['author_name'].apply(lambda x: x.replace('ü', 'у'))
-
     article_author['author_name'] = article_author['author_name'].apply(lambda x: x.capitalize())
 
+    example_authors = pd.read_excel('authors_example.xlsx')['Фамилия']
+    different_lastname_set = set(article_author['author_name']) - set(example_authors)
+
+    for i in range(article_author.shape[0]):
+        lastname = article_author['author_name'].iloc[i]
+        if lastname not in different_lastname_set:
+            if lastname != main_fix(lastname)[0]:
+                root = tkinter.Tk()
+                root.withdraw()
+
+                variant_list = np.unique([f"{main_fix(lastname)[i]}" for i in range(len(main_fix(lastname)))])
+                messagebox.showerror('Ошибка', f'Возможно неправильное написание слова: {lastname} \n'
+                                               f'Варианты написания: \n {variant_list}')
 
     article_author.to_excel("article_author.xlsx")
 
 
-    # example_authors = pd.read_excel('authors_example.xlsx')['Фамилия']
-    # different_lastname_set = set(article_author['author_name']) - set(example_authors)
-    #
-    # for i in range(article_author.shape[0]):
-    #     lastname = article_author['author_name'].iloc[i]
-    #     if lastname not in different_lastname_set:
-    #         if lastname != main_fix(lastname)[0]:
-    #             root = tkinter.Tk()
-    #             root.withdraw()
-    #
-    #             variant_list = np.unique([f"{main_fix(lastname)[i]}" for i in range(len(main_fix(lastname)))])
-    #             messagebox.showerror('Ошибка', f'Возможно неправильное написание слова: {lastname} \n'
-    #                                            f'Варианты написания: \n {variant_list}')
-    #
-    # article_author.to_excel("article_author.xlsx")
+if __name__ == "__main__":
+    parse_articles_to_excel('new_article.xml')
 
 
