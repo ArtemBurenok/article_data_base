@@ -26,6 +26,7 @@ class Ui_MainWindow(object):
         self.widget = QtWidgets.QWidget(parent=self.widget_3)
         self.widget.setGeometry(QtCore.QRect(10, 10, 961, 42))
         self.widget.setObjectName("widget")
+        self.widget.setStyleSheet("background-color: #f5eded;")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.widget)
         self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_3.setSpacing(0)
@@ -212,13 +213,13 @@ class Ui_MainWindow(object):
         self.tableWidget_add_row = QtWidgets.QTableWidget(parent=self.page_7)
         self.tableWidget_add_row.setGeometry(QtCore.QRect(30, 40, 911, 71))
         self.tableWidget_add_row.setRowCount(1)
-        self.tableWidget_add_row.setColumnCount(37)
+        self.tableWidget_add_row.setColumnCount(39)
         self.tableWidget_add_row.setObjectName("tableWidget_add_row")
         column_names_add = ["item_id", "linkurl", "genre", "type", "journal_title", "issn", "eissn",
                         "publisher", "vak", "rcsi", "wos", "scopus", "quartile", "year", "number",
                         "contnumber", "volume", "page_begin", "page_end", "language",
-                        "title_article", "doi", "edn", "grnti", "risc", "corerisc",
-                        "last_name", "first_name", "patronymic", "position", "degree", "employment_relationship",
+                        "title_article", "doi", "edn", "grnti", "risc", "corerisc","author_id",
+                        "last_name", "first_name", "patronymic","lastname_with_initials", "position", "degree", "employment_relationship",
                         "birth_year", "author_count", "aff_count", "org_id", "org_name"]
         self.tableWidget_add_row.setHorizontalHeaderLabels(column_names_add)
         self.add_one_row_button = QtWidgets.QPushButton(parent=self.page_7)
@@ -226,7 +227,10 @@ class Ui_MainWindow(object):
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap("icons/icone-excel-jaune.png"),
                         QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
-        self.add_one_row_button.setIcon(icon2)
+        iconDB = QtGui.QIcon()
+        iconDB.addPixmap(QtGui.QPixmap("icons/db_icon_orange-removebg-preview.png"),
+                        QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        self.add_one_row_button.setIcon(iconDB)
         self.add_one_row_button.setIconSize(QtCore.QSize(90, 90))
         self.add_one_row_button.setObjectName("add_one_row_button")
         self.stackedWidget.addWidget(self.page_7)
@@ -286,9 +290,36 @@ class Ui_MainWindow(object):
         self.page_8 = QtWidgets.QWidget()
         self.page_8.setObjectName("page_8")
         self.progressBar = QtWidgets.QProgressBar(parent=self.page_8)
-        self.progressBar.setGeometry(QtCore.QRect(260, 230, 461, 161))
-        self.progressBar.setProperty("value", 24)
+        self.progressBar.setGeometry(QtCore.QRect(80, 420, 821, 161))
+        font = QtGui.QFont()
+        font.setPointSize(18)
+        self.progressBar.setFont(font)
+        self.progressBar.setStyleSheet("#progressBar {background-color: rgb(98, 114, 164);\n"
+                                       "color:  #554348;\n"
+                                       "border-style: none;\n"
+                                       "border-radius: 10px;\n"
+                                       "text-align: center;\n"
+                                       "}\n"
+                                       "#progressBar::chunk {\n"
+                                       "    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(255, 128, 8, 255), stop:1 rgba(255, 200, 55, 255));\n"
+                                       "    border-radius: 10px;\n"
+                                       "}\n"
+                                       "")
+        self.progressBar.setProperty("value", 89)
         self.progressBar.setObjectName("progressBar")
+        self.label_4 = QtWidgets.QLabel(parent=self.page_8)
+        self.label_4.setGeometry(QtCore.QRect(140, 90, 681, 211))
+        font = QtGui.QFont()
+        font.setPointSize(50)
+        font.setBold(True)
+        self.label_4.setFont(font)
+        self.label_4.setStyleSheet("#label_4 {\n"
+                                   "color: black;\n"
+                                   "font-weight: bold;\n"
+                                   "font-size: 50pt;\n"
+                                   "}")
+        self.label_4.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.label_4.setObjectName("label_4")
         self.stackedWidget.addWidget(self.page_8)
         self.gridLayout.addWidget(self.widget_3, 0, 2, 1, 1)
         self.widget_onlyicons = QtWidgets.QWidget(parent=self.centralwidget)
@@ -584,6 +615,7 @@ class Ui_MainWindow(object):
         self.pushButton.setText(_translate("MainWindow", "Export to Excel"))
         self.general_data_export_button.setText(_translate("MainWindow", "Export to Excel"))
         self.label_3.setText(_translate("MainWindow", "  Database"))
+        self.label_4.setText(_translate("MainWindow", "Импорт XML Файла "))
         self.home_button_iconexpandedwidget.setText(_translate("MainWindow", "Главная"))
         self.articleDB_button.setText(_translate("MainWindow", "Article"))
         self.article_authorDB_button.setText(_translate("MainWindow", "Article_author"))

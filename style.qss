@@ -157,3 +157,21 @@
 		border-radius: 25px;
 	}
 /*= END
+MainWindow {
+    background-color: #FF0000;
+}
+
+  /*= Style for user information button START
+  ==================================================== */
+	#centralwidget {
+    background-color: #f5eded;
+}
+/*= END
+
+
+  /*= Style for user information button START
+  ==================================================== */
+	#widget {
+    background-color: #f5eded;
+}
+/*= END

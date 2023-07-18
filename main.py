@@ -36,6 +36,8 @@ class MainWindow(QMainWindow):
         self.search_button.clicked.connect(self.get_test_auf)
         self.user_button = self.findChild(QPushButton, "user_button")
         self.user_button.clicked.connect(lambda: self.authorsReferenceToSQL(database_parametres))
+        self.add_one_row_button = self.findChild(QPushButton, "add_one_row_button")
+        self.add_one_row_button.clicked.connect(self.addOneRowToDB)
 
     def process_data(self):
         connection = psycopg2.connect(
@@ -290,19 +292,19 @@ class MainWindow(QMainWindow):
             merged_data = existing_data.merge(data_frame, how='outer')
         else:
             merged_data = existing_data.merge(data_frame, how='outer').drop_duplicates(keep=False)
-        if table_name == 'article_author':
-            column_types = existing_data.dtypes
-            column_types_excel = data_frame.dtypes
-            column_types_merged = merged_data.dtypes
-            print(column_types)
-            print(column_types_excel)
-            print(column_types_merged)
-        #     pd.set_option('display.max_columns', None)
-        #     pd.set_option('display.max_rows', None)
-        #     print(existing_data.select_dtypes(include=['object']).applymap(type))
-        #     print(data_frame.select_dtypes(include=['object']).applymap(type))
+        # if table_name == 'article_author':
+        #     column_types = existing_data.dtypes
+        #     column_types_excel = data_frame.dtypes
+        #     column_types_merged = merged_data.dtypes
+        #     print(column_types)
+        #     print(column_types_excel)
+        #     print(column_types_merged)
+        # #     pd.set_option('display.max_columns', None)
+        # #     pd.set_option('display.max_rows', None)
+        # #     print(existing_data.select_dtypes(include=['object']).applymap(type))
+        # #     print(data_frame.select_dtypes(include=['object']).applymap(type))
         merged_data_with_duplicates = existing_data.merge(data_frame, how='outer')
-        num_duplicates = len(merged_data) - len(merged_data)
+        num_duplicates = len(merged_data_with_duplicates) - len(merged_data)
         rows_added = len(merged_data) - rows_before
         if rows_added >= 0:
             print(f"Added to {table_name}  {rows_added} rows")
@@ -352,11 +354,8 @@ class MainWindow(QMainWindow):
             print("Выбор файла отменен. Файл не был перемещен.")
 
     # def import_xlsx_to_postgresql(self, database_params, xlsx_file_path, table_name):
-    #     print(1)
     #     connection_str = f"postgresql://{database_params['user']}:{database_params['password']}@{database_params['host']}:{database_params['port']}/{database_params['dbname']}"
-    #     print(2)
     #     engine = create_engine(connection_str)
-    #     print(3)
     #     data_frame = pd.read_excel(xlsx_file_path)
     #
     #     data_frame.to_sql(table_name, engine, index=False, if_exists='replace')
@@ -411,9 +410,7 @@ class MainWindow(QMainWindow):
             GROUP BY doi, article.item_id
         ) AS nested_aff ON article.item_id = nested_aff.item_id
         WHERE authors_organisations.org_id = '570'
-            
                            """
-
         query = query.format(columns=columns)
         conn = psycopg2.connect(database=database_parametres['dbname'],
                                 user=database_parametres['user'],
@@ -423,7 +420,8 @@ class MainWindow(QMainWindow):
         cur = conn.cursor()
         cur.execute(query)
         result = cur.fetchall()
-        df = pd.DataFrame(result, columns=[columns])
+        columns = columns.split(",")
+        df = pd.DataFrame(result, columns=columns)
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         output_path = f"userTemplate_{timestamp}.xlsx"
         df.to_excel(output_path, index=False, sheet_name='Sheet1')
@@ -481,6 +479,13 @@ class MainWindow(QMainWindow):
                 else:
                     text_array.append(current_text)
         result = ','.join(text_array)
+        print(result)
+        result = result.split(",")
+        print(result)
+        result = pd.Series(result).drop_duplicates().tolist()
+        print(result)
+        result = ','.join(result)
+        print(result)
         self.userChoicePatternFetchFromDB(result)
 
     def get_text(self):
@@ -488,6 +493,120 @@ class MainWindow(QMainWindow):
         selected_text = self.ui.comboBox.currentText()
         self.searchButtonDBConnector(selected_text, text)
 
+    def addOneRowToDB(self):
+        for row in range(self.ui.tableWidget_add_row.rowCount()):
+            row_data = []
+            for column in range(self.ui.tableWidget_add_row.columnCount()):
+                item = self.ui.tableWidget_add_row.item(row, column)
+                if item is not None:
+                    cell_data = item.text()
+                    row_data.append(cell_data)
+                else:
+                    row_data.append("NULL")
+            newRowForArticleTable = ', '.join(row_data[:26]) # article
+            newRowForAuthorSplittedTable = ', '.join(row_data[26:30])  # auth_splitted
+            newRowForArticleAuthorTable = ', '.join([row_data[0], row_data[26], row_data[27]]) # article_author
+            newRowForAuthorsOrganisationsTable = ', '.join([row_data[26], row_data[27], row_data[37], row_data[38]]) #auth_org
+            newRowForOrganisationsTable = ', '.join([row_data[37], row_data[38]])  # organisations
+            newRowForAuthorsReferenceWithIDTable = ', '.join([row_data[26], row_data[30], row_data[27], row_data[28], row_data[29], row_data[31]
+            , row_data[32], row_data[33], row_data[34]]) # auth_ref_with_id
+            self.insertNewRowInArticleTable(newRowForArticleTable)
+            self.insertNewRowInAuthorsSplittedTable(newRowForAuthorSplittedTable)
+            self.insertNewRowInArticleAuthorTable(newRowForArticleAuthorTable)
+            self.insertNewRowInAuthorsOrganisationsTable(newRowForAuthorsOrganisationsTable)
+            self.insertNewRowInOrganisationsTable(newRowForOrganisationsTable)
+            self.insertNewRowInAuthorsReferenceTable(newRowForAuthorsReferenceWithIDTable)
+            QMessageBox.information(self, "Успешно", "Строка была добавлена в базу данных!")
+
+    def insertNewRowInArticleTable(self, row_1):
+        query = """
+                        INSERT INTO article VALUES
+                        ({});
+                        """
+
+        query = query.format(row_1)
+        conn = psycopg2.connect(database=database_parametres['dbname'],
+                                user=database_parametres['user'],
+                                password=database_parametres['password'],
+                                host=database_parametres['host'],
+                                port=database_parametres['port'])
+        cur = conn.cursor()
+        cur.execute(query)
+
+    def insertNewRowInAuthorsSplittedTable(self, row_1):
+        query = """
+                        INSERT INTO authors_splitted VALUES
+                        ({});
+                        """
+
+        query = query.format(row_1)
+        conn = psycopg2.connect(database=database_parametres['dbname'],
+                                user=database_parametres['user'],
+                                password=database_parametres['password'],
+                                host=database_parametres['host'],
+                                port=database_parametres['port'])
+        cur = conn.cursor()
+        cur.execute(query)
+
+    def insertNewRowInArticleAuthorTable(self, row_1):
+        query = """
+                        INSERT INTO article_author VALUES
+                        ({});  
+                        """
+
+        query = query.format(row_1)
+        conn = psycopg2.connect(database=database_parametres['dbname'],
+                                user=database_parametres['user'],
+                                password=database_parametres['password'],
+                                host=database_parametres['host'],
+                                port=database_parametres['port'])
+        cur = conn.cursor()
+        cur.execute(query)
+
+    def insertNewRowInAuthorsOrganisationsTable(self, row_1):
+        query = """
+                        INSERT INTO authors_organisations VALUES
+                        ({}); 
+                        """
+
+        query = query.format(row_1)
+        conn = psycopg2.connect(database=database_parametres['dbname'],
+                                user=database_parametres['user'],
+                                password=database_parametres['password'],
+                                host=database_parametres['host'],
+                                port=database_parametres['port'])
+        cur = conn.cursor()
+        cur.execute(query)
+
+    def insertNewRowInOrganisationsTable(self, row_1):
+        query = """
+                        INSERT INTO organisations VALUES
+                        ({}); 
+                        """
+
+        query = query.format(row_1)
+        conn = psycopg2.connect(database=database_parametres['dbname'],
+                                user=database_parametres['user'],
+                                password=database_parametres['password'],
+                                host=database_parametres['host'],
+                                port=database_parametres['port'])
+        cur = conn.cursor()
+        cur.execute(query)
+
+    def insertNewRowInAuthorsReferenceTable(self, row_1):
+        query = """
+                        INSERT INTO authors_reference_with_id VALUES
+                        ({});  
+                        """
+
+        query = query.format(row_1)
+        conn = psycopg2.connect(database=database_parametres['dbname'],
+                                user=database_parametres['user'],
+                                password=database_parametres['password'],
+                                host=database_parametres['host'],
+                                port=database_parametres['port'])
+        cur = conn.cursor()
+        cur.execute(query)
     def authorsReferenceToSQL(self,database_params):
         fname = QFileDialog.getOpenFileName(self, "Open XML file", "", "All Files (*);; XML Files (*.xml)")
         if fname[0]:
@@ -567,7 +686,6 @@ if __name__ == "__main__":
     with open("style.qss", "r") as style_file:
         style_str = style_file.read()
     app.setStyleSheet(style_str)
-
 
     window = MainWindow()
     window.show()
