@@ -127,11 +127,33 @@
 
   /*= Style for user information button START
   ==================================================== */
-	#pushButton  {
+	#pushButton {
 		color:white;
 		background-color:#0a7e8c;
 		font-weight: bold;
 		font-size: 24pt;
+		border-radius: 25px;
+	}
+/*= END
+
+  /*= Style for user information button START
+  ==================================================== */
+	#add_one_row_button {
+		color:white;
+		background-color:#0a7e8c;
+		font-weight: bold;
+		font-size: 16pt;
+		border-radius: 25px;
+	}
+/*= END
+
+  /*= Style for user information button START
+  ==================================================== */
+	#general_data_export_button {
+		color:white;
+		background-color:#0a7e8c;
+		font-weight: bold;
+		font-size: 16pt;
 		border-radius: 25px;
 	}
 /*= END

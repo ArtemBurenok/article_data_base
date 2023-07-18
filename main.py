@@ -32,6 +32,8 @@ class MainWindow(QMainWindow):
         self.import_button_expandedwidget.clicked.connect(self.importButtonClickHandler)
         self.search_button = self.findChild(QPushButton, "Primary")
         self.search_button.clicked.connect(self.get_text)
+        self.search_button = self.findChild(QPushButton, "general_data_export_button")
+        self.search_button.clicked.connect(self.get_test_auf)
         self.user_button = self.findChild(QPushButton, "user_button")
         self.user_button.clicked.connect(lambda: self.authorsReferenceToSQL(database_parametres))
 
@@ -73,13 +75,12 @@ class MainWindow(QMainWindow):
   			WHEN (authors_splitted.patronymic LIKE '%.%' AND authors_reference_with_id.birth_year IS NOT NULL) OR authors_splitted.patronymic IS NULL OR (authors_splitted.patronymic ~ '[A-Za-z]'  AND authors_reference_with_id.birth_year IS NOT NULL)
 			THEN authors_reference_with_id.patronymic
   			ELSE authors_splitted.patronymic
-			END,
+			END AS patronymic,
 			authors_reference_with_id.position,
 			authors_reference_with_id.academic_degree,
 			authors_reference_with_id.employment_relationship,
 			authors_reference_with_id.birth_year,
-            nested_auth.author_count,
-			nested_aff.aff_count
+            nested_auth.author_count
         FROM
             authors_splitted
         JOIN
@@ -100,13 +101,6 @@ class MainWindow(QMainWindow):
                 FROM article_author
                 GROUP BY item_id
             ) AS nested_auth ON article.item_id = nested_auth.item_id
-		JOIN
-			(
-				SELECT article.item_id,COUNT(author_name) AS aff_count
-				FROM article
-				INNER JOIN article_author ON article.item_id = article_author.item_id
-				GROUP BY doi,article.item_id
-			)AS nested_aff ON article.item_id = nested_aff.item_id
         WHERE
             authors_organisations.org_id = '570'
                 """
@@ -132,7 +126,7 @@ class MainWindow(QMainWindow):
         df_template['Ученая степень *'] = df['academic_degree']
         df_template['Тип трудовых отношений *'] = df['employment_relationship']
         df_template['Год рождения *'] = df['birth_year']
-        df_template['Количество аффиляций *'] = df['aff_count']
+        # df_template['Количество аффиляций *'] = df['aff_count']
         df_template['Аффиляция *'] = df['org_name']
         df_template['Дата публикации *'] = pd.to_datetime(df['year'], format='%Y').dt.strftime('01/01/%Y')
         df_template['Наименование публикации *'] = df['title_article']
@@ -320,23 +314,39 @@ class MainWindow(QMainWindow):
 
 
     def importButtonClickHandler(self):
+        self.ui.progressBar.setValue(0)
         fname = QFileDialog.getOpenFileName(self, "Open XML file", "", "All Files (*);; XML Files (*.xml)")
         if fname[0]:
             parse_articles_to_excel(fname[0])
+            self.ui.progressBar.setValue(10)
             parse_affilations_to_excel(fname[0])
+            self.ui.progressBar.setValue(20)
             extract_authors_info(fname[0])
+            self.ui.progressBar.setValue(30)
             self.import_xlsx_to_postgresql(database_parametres, 'article_author.xlsx', 'article_author', 0, False)
+            self.ui.progressBar.setValue(35)
             self.import_xlsx_to_postgresql(database_parametres, 'article.xlsx', 'article', None, True)
+            self.ui.progressBar.setValue(40)
             self.import_xlsx_to_postgresql(database_parametres, 'authors.xlsx', 'authors', 0,False)
+            self.ui.progressBar.setValue(45)
             self.import_xlsx_to_postgresql(database_parametres, 'new_one_authors_organisations.xlsx', 'authors_organisations', 0,False)
+            self.ui.progressBar.setValue(50)
             self.import_xlsx_to_postgresql(database_parametres, 'one_unique_organisations.xlsx', 'organisations',0,False)
+            self.ui.progressBar.setValue(55)
             self.execute_query_with_params(self.setEmptyValuesToNullAOTable_query)
+            self.ui.progressBar.setValue(60)
             self.execute_query_with_params(self.setEmptyValuesToNullAATable_query)
+            self.ui.progressBar.setValue(70)
             self.execute_query_with_params(self.splitInitials_query)
+            self.ui.progressBar.setValue(75)
             self.execute_query_with_params(self.deleteUselessDuplicatesFromASSTable_query)
+            self.ui.progressBar.setValue(80)
             self.execute_query_with_params(self.setEmptyValuesToNullASSTable_query)
+            self.ui.progressBar.setValue(90)
             self.execute_query_with_params(self.createAuthorsReference_query)
+            self.ui.progressBar.setValue(95)
             self.execute_query_with_params(self.getOnlyDistinctRowsFromAATable_query)
+            self.ui.progressBar.setValue(100)
             QMessageBox.information(self, "Успешный импорт", "Данные были перенесены в Базу Данных!")
         else:
             print("Выбор файла отменен. Файл не был перемещен.")
@@ -376,6 +386,102 @@ class MainWindow(QMainWindow):
                 self.ui.tableWidget.setItem(row_number, column_number, QtWidgets.QTableWidgetItem(str(data)))
         cur.close()
         conn.close()
+
+    def userChoicePatternFetchFromDB(self,columns):
+        query = """
+                        SELECT DISTINCT {columns}
+        FROM authors_splitted
+        JOIN authors_organisations ON CAST(authors_splitted.author_id AS text) = authors_organisations.author_id
+                                   OR (authors_splitted.author_id IS NULL AND authors_organisations.author_id IS NULL)
+                                   AND authors_splitted.lastname = authors_organisations.author_name
+        JOIN article_author ON CAST(article_author.author_id AS text) = authors_organisations.author_id
+                            OR (article_author.author_id IS NULL AND authors_organisations.author_id IS NULL)
+                            AND authors_organisations.author_name = article_author.author_name
+        JOIN article ON article.item_id = article_author.item_id
+        LEFT JOIN authors_reference_with_id ON CAST(authors_reference_with_id.author_id AS text) = authors_organisations.author_id
+        JOIN (
+            SELECT item_id, COUNT(author_name) AS author_count
+            FROM article_author
+            GROUP BY item_id
+        ) AS nested_auth ON article.item_id = nested_auth.item_id
+        JOIN (
+            SELECT article.item_id, COUNT(author_name) AS aff_count
+            FROM article
+            INNER JOIN article_author ON article.item_id = article_author.item_id
+            GROUP BY doi, article.item_id
+        ) AS nested_aff ON article.item_id = nested_aff.item_id
+        WHERE authors_organisations.org_id = '570'
+            
+                           """
+
+        query = query.format(columns=columns)
+        conn = psycopg2.connect(database=database_parametres['dbname'],
+                                user=database_parametres['user'],
+                                password=database_parametres['password'],
+                                host=database_parametres['host'],
+                                port=database_parametres['port'])
+        cur = conn.cursor()
+        cur.execute(query)
+        result = cur.fetchall()
+        df = pd.DataFrame(result, columns=[columns])
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        output_path = f"userTemplate_{timestamp}.xlsx"
+        df.to_excel(output_path, index=False, sheet_name='Sheet1')
+        QMessageBox.information(self, "Экспорт", "Excel файл по шаблону пользователя создан!")
+
+    def exportConnector(self, year, lastname):
+        query = """
+                        SELECT a.item_id, aa.author_name, a.linkurl, a.genre, a.type, a.journal_title, a.publisher, a.title_article
+                        FROM article AS a
+                        INNER JOIN article_author AS aa ON aa.item_id = a.item_id
+                        WHERE a.year = '{year}' AND aa.author_name = '{lastname}'
+                        """
+
+        query = query.format(year=year, lastname=lastname)
+        conn = psycopg2.connect(database=database_parametres['dbname'],
+                                user=database_parametres['user'],
+                                password=database_parametres['password'],
+                                host=database_parametres['host'],
+                                port=database_parametres['port'])
+        cur = conn.cursor()
+        cur.execute(query)
+        result = cur.fetchall()
+
+    def get_test_auf(self):
+        text_array = []
+
+        for combobox in self.ui.comboboxes:
+            current_text = combobox.currentText()
+            if current_text != 'None':
+                if current_text in ["item_id", "linkurl", "genre", "type", "journal_title", "issn", "eissn",
+                                    "publisher", "vak", "rcsi", "wos", "scopus", "quartile", "year", "number",
+                                    "contnumber", "volume", "page_begin", "page_end", "language",
+                                    "title_article", "doi", "edn", "grnti", "risc", "corerisc"]:
+                    text_array.append("article." + current_text)
+                elif current_text == "last_name":
+                    text_array.append(
+                        "CASE WHEN authors_splitted.lastname ~ '[A-Za-z]' AND authors_reference_with_id.birth_year IS NOT NULL THEN authors_reference_with_id.lastname ELSE authors_splitted.lastname END AS last_name")
+                elif current_text == "first_name":
+                    text_array.append(
+                        "CASE WHEN (authors_splitted.first_name LIKE '%.%' AND authors_reference_with_id.birth_year IS NOT NULL) OR (authors_splitted.first_name ~ '[A-Za-z]' AND authors_reference_with_id.birth_year IS NOT NULL) OR authors_splitted.first_name IS NULL THEN authors_reference_with_id.first_name ELSE authors_splitted.first_name END AS first_name")
+                elif current_text == "patronymic":
+                    text_array.append(
+                        "CASE WHEN (authors_splitted.patronymic LIKE '%.%' AND authors_reference_with_id.birth_year IS NOT NULL) OR authors_splitted.patronymic IS NULL OR (authors_splitted.patronymic ~ '[A-Za-z]'  AND authors_reference_with_id.birth_year IS NOT NULL) THEN authors_reference_with_id.patronymic ELSE authors_splitted.patronymic END AS patronymic")
+                elif current_text in ["position", "degree", "employment_relationship",
+                        "birth_year"]:
+                    text_array.append("authors_reference_with_id." + current_text)
+                elif current_text == "author_count":
+                    text_array.append("nested_auth." + current_text)
+                elif current_text == "aff_count":
+                    text_array.append("nested_aff." + current_text)
+                elif current_text == "org_id":
+                    text_array.append("authors_organisations." + current_text)
+                elif current_text == "org_name":
+                    text_array.append("authors_organisations." + current_text)
+                else:
+                    text_array.append(current_text)
+        result = ','.join(text_array)
+        self.userChoicePatternFetchFromDB(result)
 
     def get_text(self):
         text = self.ui.textEdit.toPlainText().strip()
@@ -443,9 +549,15 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(7)
 
     def on_import_button_onlyiconwidget_toggled(self):
-        self.ui.stackedWidget.setCurrentIndex(8)
+        self.ui.stackedWidget.setCurrentIndex(9)
 
     def on_import_button_expandedwidget_toggled(self):
+        self.ui.stackedWidget.setCurrentIndex(9)
+
+    def on_pushButton_2_toggled(self):
+        self.ui.stackedWidget.setCurrentIndex(8)
+
+    def on_pushButton_5_toggled(self):
         self.ui.stackedWidget.setCurrentIndex(8)
 
 

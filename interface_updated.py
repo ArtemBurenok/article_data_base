@@ -141,11 +141,11 @@ class Ui_MainWindow(object):
 "\n"
 "#Primary {\n"
 "\n"
-"    background-color:#0a7e8c;\n"
+"    background-color:#eedd66;\n"
 "}\n"
 "\n"
 "#Primary:hover {\n"
-"    background-color: #0a7e8c;\n"
+"    background-color: #9e986d;\n"
 "}\n"
 "\n"
 "#Primary:pressed {\n"
@@ -209,9 +209,26 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.page_6)
         self.page_7 = QtWidgets.QWidget()
         self.page_7.setObjectName("page_7")
-        self.label_4 = QtWidgets.QLabel(parent=self.page_7)
-        self.label_4.setGeometry(QtCore.QRect(0, 0, 961, 641))
-        self.label_4.setObjectName("label_4")
+        self.tableWidget_add_row = QtWidgets.QTableWidget(parent=self.page_7)
+        self.tableWidget_add_row.setGeometry(QtCore.QRect(30, 40, 911, 71))
+        self.tableWidget_add_row.setRowCount(1)
+        self.tableWidget_add_row.setColumnCount(37)
+        self.tableWidget_add_row.setObjectName("tableWidget_add_row")
+        column_names_add = ["item_id", "linkurl", "genre", "type", "journal_title", "issn", "eissn",
+                        "publisher", "vak", "rcsi", "wos", "scopus", "quartile", "year", "number",
+                        "contnumber", "volume", "page_begin", "page_end", "language",
+                        "title_article", "doi", "edn", "grnti", "risc", "corerisc",
+                        "last_name", "first_name", "patronymic", "position", "degree", "employment_relationship",
+                        "birth_year", "author_count", "aff_count", "org_id", "org_name"]
+        self.tableWidget_add_row.setHorizontalHeaderLabels(column_names_add)
+        self.add_one_row_button = QtWidgets.QPushButton(parent=self.page_7)
+        self.add_one_row_button.setGeometry(QtCore.QRect(250, 260, 491, 191))
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap("icons/icone-excel-jaune.png"),
+                        QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        self.add_one_row_button.setIcon(icon2)
+        self.add_one_row_button.setIconSize(QtCore.QSize(90, 90))
+        self.add_one_row_button.setObjectName("add_one_row_button")
         self.stackedWidget.addWidget(self.page_7)
         self.page_9 = QtWidgets.QWidget()
         self.page_9.setObjectName("page_9")
@@ -226,11 +243,52 @@ class Ui_MainWindow(object):
         self.pushButton.setIconSize(QtCore.QSize(90, 90))
         self.pushButton.setObjectName("pushButton")
         self.stackedWidget.addWidget(self.page_9)
+        self.page_10 = QtWidgets.QWidget()
+        self.page_10.setObjectName("page_10")
+        self.tableWidget_for_selecting_columns = QtWidgets.QTableWidget(parent=self.page_10)
+        self.tableWidget_for_selecting_columns.setGeometry(QtCore.QRect(20, 60, 911, 71))
+        self.tableWidget_for_selecting_columns.setRowCount(1)
+        self.tableWidget_for_selecting_columns.setColumnCount(38)
+        self.comboboxes = []
+
+        for column in range(38):
+                combobox_name = f"combobox{column + 1}"  # Generate unique combobox name
+
+                # Create the combobox dynamically using the unique name
+                setattr(self, combobox_name, QtWidgets.QComboBox())
+
+                data = [
+                        "None", "item_id", "linkurl", "genre", "type", "journal_title", "issn", "eissn",
+                        "publisher", "vak", "rcsi", "wos", "scopus", "quartile", "year", "number",
+                        "contnumber", "volume", "page_begin", "page_end", "language",
+                        "title_article", "doi", "edn", "grnti", "risc", "corerisc",
+                        "last_name", "first_name", "patronymic", "position", "degree", "employment_relationship",
+                        "birth_year", "author_count", "aff_count", "org_id", "org_name"
+                ]
+
+                # Access the dynamically created combobox using the unique name
+                combobox = getattr(self, combobox_name)
+
+                combobox.clear()  # Clear any existing items
+                combobox.addItems(data)
+                self.tableWidget_for_selecting_columns.setCellWidget(0, column, combobox)
+
+                self.comboboxes.append(combobox)
+
+
+        self.tableWidget_for_selecting_columns.setObjectName("tableWidget_for_selecting_columns")
+        self.general_data_export_button = QtWidgets.QPushButton(parent=self.page_10)
+        self.general_data_export_button.setGeometry(QtCore.QRect(230, 250, 491, 191))
+        self.general_data_export_button.setIcon(icon2)
+        self.general_data_export_button.setIconSize(QtCore.QSize(90, 90))
+        self.general_data_export_button.setObjectName("general_data_export_button")
+        self.stackedWidget.addWidget(self.page_10)
         self.page_8 = QtWidgets.QWidget()
         self.page_8.setObjectName("page_8")
-        self.label_5 = QtWidgets.QLabel(parent=self.page_8)
-        self.label_5.setGeometry(QtCore.QRect(270, 230, 49, 16))
-        self.label_5.setObjectName("label_5")
+        self.progressBar = QtWidgets.QProgressBar(parent=self.page_8)
+        self.progressBar.setGeometry(QtCore.QRect(260, 230, 461, 161))
+        self.progressBar.setProperty("value", 24)
+        self.progressBar.setObjectName("progressBar")
         self.stackedWidget.addWidget(self.page_8)
         self.gridLayout.addWidget(self.widget_3, 0, 2, 1, 1)
         self.widget_onlyicons = QtWidgets.QWidget(parent=self.centralwidget)
@@ -342,6 +400,14 @@ class Ui_MainWindow(object):
         self.export_button_onlyiconwidget.setObjectName("export_button_onlyiconwidget")
         self.verticalLayout.addWidget(self.export_button_onlyiconwidget)
         self.verticalLayout_3.addLayout(self.verticalLayout)
+        self.pushButton_5 = QtWidgets.QPushButton(parent=self.widget_onlyicons)
+        self.pushButton_5.setText("")
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap("Sample_User_Icon.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        self.pushButton_5.setIcon(icon7)
+        self.pushButton_5.setIconSize(QtCore.QSize(20, 20))
+        self.pushButton_5.setObjectName("pushButton_5")
+        self.verticalLayout_3.addWidget(self.pushButton_5)
         spacerItem2 = QtWidgets.QSpacerItem(20, 531, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
         self.verticalLayout_3.addItem(spacerItem2)
         self.exit_iconwidget = QtWidgets.QPushButton(parent=self.widget_onlyicons)
@@ -375,8 +441,15 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.label_2)
         self.label_3 = QtWidgets.QLabel(parent=self.widget_expanded)
         font = QtGui.QFont()
-        font.setPointSize(15)
+        font.setPointSize(12)
+        font.setBold(True)
         self.label_3.setFont(font)
+        self.label_3.setStyleSheet("QLabel {\n"
+                                   "    font-size: 14pt;\n"
+                                   "    color: #eedd66;\n"
+                                   "    font-weight: bold;\n"
+                                   "    border-radius: 8px;\n"
+                                   "}")
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_2.addWidget(self.label_3)
         self.verticalLayout_4.addLayout(self.horizontalLayout_2)
@@ -444,6 +517,13 @@ class Ui_MainWindow(object):
         self.export_button_expandedwidget.setAutoExclusive(True)
         self.export_button_expandedwidget.setObjectName("export_button_expandedwidget")
         self.verticalLayout_2.addWidget(self.export_button_expandedwidget)
+        self.pushButton_2 = QtWidgets.QPushButton(parent=self.widget_expanded)
+        self.pushButton_2.setIcon(icon6)
+        self.pushButton_2.setCheckable(True)
+        self.pushButton_2.setAutoExclusive(True)
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.verticalLayout_2.addWidget(self.pushButton_2)
+        self.verticalLayout_4.addLayout(self.verticalLayout_2)
         self.verticalLayout_4.addLayout(self.verticalLayout_2)
         spacerItem4 = QtWidgets.QSpacerItem(20, 547, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
         self.verticalLayout_4.addItem(spacerItem4)
@@ -480,6 +560,8 @@ class Ui_MainWindow(object):
         self.organisationsDB_button.toggled['bool'].connect(self.organisationsDB_button_iconwidget.setChecked) # type: ignore
         self.addingdatatoBD_button_iconwidget.toggled['bool'].connect(self.addingdatatoBD_button.setChecked) # type: ignore
         self.addingdatatoBD_button.toggled['bool'].connect(self.addingdatatoBD_button_iconwidget.setChecked) # type: ignore
+        self.pushButton_2.toggled['bool'].connect(self.pushButton_5.setChecked)  # type: ignore
+        self.pushButton_5.toggled['bool'].connect(self.pushButton_2.setChecked)  # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -498,9 +580,9 @@ class Ui_MainWindow(object):
         self.comboBox.setItemText(9, _translate("MainWindow", "2027"))
         self.comboBox.setItemText(10, _translate("MainWindow", "2028"))
         self.Primary.setText(_translate("MainWindow", "Поиск"))
-        self.label_4.setText(_translate("MainWindow", "Adding data"))
+        self.add_one_row_button.setText(_translate("MainWindow", "Добавить строку в Базу Данных"))
         self.pushButton.setText(_translate("MainWindow", "Export to Excel"))
-        self.label_5.setText(_translate("MainWindow", "Import"))
+        self.general_data_export_button.setText(_translate("MainWindow", "Export to Excel"))
         self.label_3.setText(_translate("MainWindow", "  Database"))
         self.home_button_iconexpandedwidget.setText(_translate("MainWindow", "Главная"))
         self.articleDB_button.setText(_translate("MainWindow", "Article"))
@@ -511,6 +593,7 @@ class Ui_MainWindow(object):
         self.addingdatatoBD_button.setText(_translate("MainWindow", "Добавление данных"))
         self.import_button_expandedwidget.setText(_translate("MainWindow", "Импорт"))
         self.export_button_expandedwidget.setText(_translate("MainWindow", "Экспорт"))
+        self.pushButton_2.setText(_translate("MainWindow", "Общий экспорт"))
         self.exit_button_expandedwidget.setText(_translate("MainWindow", "Выход"))
 
     def dataLoadFromDB(self,tableWidget, query):
