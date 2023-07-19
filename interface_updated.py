@@ -213,14 +213,14 @@ class Ui_MainWindow(object):
         self.tableWidget_add_row = QtWidgets.QTableWidget(parent=self.page_7)
         self.tableWidget_add_row.setGeometry(QtCore.QRect(30, 40, 911, 71))
         self.tableWidget_add_row.setRowCount(1)
-        self.tableWidget_add_row.setColumnCount(39)
+        self.tableWidget_add_row.setColumnCount(40)
         self.tableWidget_add_row.setObjectName("tableWidget_add_row")
         column_names_add = ["item_id", "linkurl", "genre", "type", "journal_title", "issn", "eissn",
                         "publisher", "vak", "rcsi", "wos", "scopus", "quartile", "year", "number",
                         "contnumber", "volume", "page_begin", "page_end", "language",
                         "title_article", "doi", "edn", "grnti", "risc", "corerisc","author_id",
                         "last_name", "first_name", "patronymic","lastname_with_initials", "position", "degree", "employment_relationship",
-                        "birth_year", "author_count", "aff_count", "org_id", "org_name"]
+                        "birth_year", "author_count", "aff_count", "org_id", "org_name", "initials"]
         self.tableWidget_add_row.setHorizontalHeaderLabels(column_names_add)
         self.add_one_row_button = QtWidgets.QPushButton(parent=self.page_7)
         self.add_one_row_button.setGeometry(QtCore.QRect(250, 260, 491, 191))

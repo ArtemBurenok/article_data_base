@@ -504,12 +504,13 @@ class MainWindow(QMainWindow):
                 else:
                     row_data.append("NULL")
             newRowForArticleTable = ', '.join(row_data[:26]) # article
-            newRowForAuthorSplittedTable = ', '.join(row_data[26:30])  # auth_splitted
+            newRowForAuthorSplittedTable = ', '.join([row_data[26],row_data[27],row_data[28],row_data[29],row_data[39]])  # auth_splitted
             newRowForArticleAuthorTable = ', '.join([row_data[0], row_data[26], row_data[27]]) # article_author
             newRowForAuthorsOrganisationsTable = ', '.join([row_data[26], row_data[27], row_data[37], row_data[38]]) #auth_org
             newRowForOrganisationsTable = ', '.join([row_data[37], row_data[38]])  # organisations
             newRowForAuthorsReferenceWithIDTable = ', '.join([row_data[26], row_data[30], row_data[27], row_data[28], row_data[29], row_data[31]
             , row_data[32], row_data[33], row_data[34]]) # auth_ref_with_id
+            print(newRowForAuthorSplittedTable)
             self.insertNewRowInArticleTable(newRowForArticleTable)
             self.insertNewRowInAuthorsSplittedTable(newRowForAuthorSplittedTable)
             self.insertNewRowInArticleAuthorTable(newRowForArticleAuthorTable)
@@ -532,6 +533,9 @@ class MainWindow(QMainWindow):
                                 port=database_parametres['port'])
         cur = conn.cursor()
         cur.execute(query)
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def insertNewRowInAuthorsSplittedTable(self, row_1):
         query = """
@@ -547,6 +551,9 @@ class MainWindow(QMainWindow):
                                 port=database_parametres['port'])
         cur = conn.cursor()
         cur.execute(query)
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def insertNewRowInArticleAuthorTable(self, row_1):
         query = """
@@ -562,6 +569,9 @@ class MainWindow(QMainWindow):
                                 port=database_parametres['port'])
         cur = conn.cursor()
         cur.execute(query)
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def insertNewRowInAuthorsOrganisationsTable(self, row_1):
         query = """
@@ -577,6 +587,9 @@ class MainWindow(QMainWindow):
                                 port=database_parametres['port'])
         cur = conn.cursor()
         cur.execute(query)
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def insertNewRowInOrganisationsTable(self, row_1):
         query = """
@@ -592,6 +605,9 @@ class MainWindow(QMainWindow):
                                 port=database_parametres['port'])
         cur = conn.cursor()
         cur.execute(query)
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def insertNewRowInAuthorsReferenceTable(self, row_1):
         query = """
@@ -607,6 +623,9 @@ class MainWindow(QMainWindow):
                                 port=database_parametres['port'])
         cur = conn.cursor()
         cur.execute(query)
+        conn.commit()
+        cur.close()
+        conn.close()
     def authorsReferenceToSQL(self,database_params):
         fname = QFileDialog.getOpenFileName(self, "Open XML file", "", "All Files (*);; XML Files (*.xml)")
         if fname[0]:
