@@ -1,6 +1,6 @@
-database_parametres= {'dbname':"praktika",
+database_parametres= {'dbname':"test_db",
                      'user':"postgres",
-                     'password':"sword9999",
+                     'password':"1234",
                      'host':"localhost",
                      'port': "5432"
 }

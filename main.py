@@ -234,6 +234,7 @@ class MainWindow(QMainWindow):
         WHERE author_id IS NOT NULL
         """
     def import_xlsx_to_postgresql(self, database_params, xlsx_file_path, table_name,index_col,article):
+
         articleTableIsEmpty = False
         connection_str = f"postgresql://{database_params['user']}:{database_params['password']}@{database_params['host']}:{database_params['port']}/{database_params['dbname']}"
         engine = create_engine(connection_str)
@@ -268,6 +269,7 @@ class MainWindow(QMainWindow):
         if table_name == 'article':
             for column in float_columns:
                 data_frame[column] = data_frame[column].apply(lambda x: replace_float_with_null(x))
+
         existing_data_query = f"SELECT DISTINCT * FROM {table_name}"
         existing_data = pd.read_sql(existing_data_query, engine)
         if table_name == 'authors_organisations':
