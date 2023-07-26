@@ -1,5 +1,9 @@
 from bs4 import BeautifulSoup
 import pandas as pd
+from check_errors import main_fix
+import tkinter
+from tkinter import messagebox
+import numpy as np
 
 
 def parse_articles_to_excel(xml_filename):
@@ -11,6 +15,9 @@ def parse_articles_to_excel(xml_filename):
     fd = open(xml_filename, 'r', encoding='utf-8')
     xml_file = fd.read()
     soup = BeautifulSoup(xml_file, 'lxml')
+
+    author_organisation = []
+    counter = 0
 
     counter_all = 0
     for tag in soup.findAll("item"):
@@ -58,18 +65,36 @@ def parse_articles_to_excel(xml_filename):
         fields['corerisc'].append(tag.find('corerisc').text if tag.find('corerisc') is not None else "")
 
         count_author_org = []
+
         # count of organisations
         for author in tag.find('authors').findAll('author'):
-            for aff in author.descendants:
-                if aff.name == 'orgname':
+            author_id = author.find('authorid').text if author.find('authorid') is not None else " "
+            author_name = author.find('lastname').text if author.find('lastname') is not None else ""
+            author_initials = author.find('initials').text if author.find('initials') is not None else ""
+
+            try:
+                for aff in author.find('affiliations'):
+                    aff_id = aff.find('orgid').text if aff.find('orgid') is not None else " "
+                    aff_name = aff.find('orgname').text if aff.find('orgname') is not None else " "
+
                     counter_all += 1
                     count_author_org.append(counter_all)
+
+                    counter += 1
+                    author_organisation.append([counter, author_id, author_name, author_initials, aff_id, aff_name])
+            except TypeError:
+                continue
+
         fields['counter'].append(count_author_org)
 
     article = pd.DataFrame(data=fields)
     article = article.explode('counter')
-    article.to_excel("article.xlsx", index=False)
 
+    authors_organisations = pd.DataFrame(author_organisation, columns=['counter', 'author_id', 'author_name',
+                                                                       'author_initials', 'org_id', 'org_name'])
+
+    whole_table = article.merge(authors_organisations, how='inner')
+    whole_table.to_excel('whole_table.xlsx')
     fd.close()
 
 
